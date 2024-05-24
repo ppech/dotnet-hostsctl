@@ -1,9 +1,14 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 
-internal class ListCommand : Command
+internal class ExistsCommand : Command<ExistsCommand.Settings>
 {
-    public override int Execute(CommandContext context)
+    public class Settings : CommandSettings
+    {
+        public required string Hosts { get; set; }
+    }
+
+    public override int Execute(CommandContext context, Settings settings)
     {
         var path = Utils.GetHostsFilePath();
 
@@ -30,5 +35,6 @@ internal class ListCommand : Command
         });
 
         return 0;
+
     }
 }
