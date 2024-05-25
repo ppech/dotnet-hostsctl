@@ -1,40 +1,47 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
+using System.Text.Json;
 
 internal class ExistsCommand : Command<ExistsCommand.Settings>
 {
     public class Settings : CommandSettings
     {
-        public required string Hosts { get; set; }
-    }
+		[CommandArgument(0, "[hosts]")]
+		public required string Hosts { get; set; }
+
+		[CommandOption("-a|--all")]
+		public bool All { get; set; }
+
+		[CommandOption("-j|--json")]
+		public bool Json { get; set; }
+	}
 
     public override int Execute(CommandContext context, Settings settings)
     {
-        var path = Utils.GetHostsFilePath();
+		var path = Utils.GetHostsFilePath();
 
-        HostsFile.Read(path, line =>
-        {
-            var m = HostsFile.HostsFileEntryPattern.Match(line);
+		var entries = HostsFile.Parse(path)
+			.Where(p => p.Hosts.Contains(settings.Hosts, StringComparison.OrdinalIgnoreCase));
 
-            if (m.Success)
-            {
-                var isEnabled = !m.Groups[1].Success;
-                var ip = m.Groups[2].Value;
-                var hosts = m.Groups[3].Value;
-                var comment = m.Groups[4].Success ? m.Groups[4].Value[1..] : string.Empty;
+		if(!settings.All)
+			entries = entries.Where(p => p.IsEnabled);
 
-                if (isEnabled)
-                {
-                    AnsiConsole.MarkupLine($"[green]{ip}[/] [blue]{hosts}[/] {comment}");
-                }
-                else
-                {
-                    AnsiConsole.MarkupLine($"[red]{ip}[/] [blue]{hosts}[/] {comment}");
-                }
-            }
-        });
+		if (settings.Json)
+		{
+			var json = JsonSerializer.Serialize(entries);
+			Console.WriteLine(json);
+		}
+		else
+		{
+			foreach (var entry in entries)
+			{
+				if (entry.IsEnabled)
+					AnsiConsole.MarkupLine($"  [blue]{entry.IP}[/] {entry.Hosts} [green]{entry.Comment}[/]");
+				else
+					AnsiConsole.MarkupLine($"[red]#[/] [grey]{entry.IP} {entry.Hosts}[/] [green]{entry.Comment}[/]");
+			}
+		}
 
-        return 0;
-
-    }
+		return entries.Any() ? 0 : -1;
+	}
 }

@@ -1,34 +1,36 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
+using System.Text.Json;
 
-internal class ListCommand : Command
+internal class ListCommand : Command<ListCommand.Settings>
 {
-    public override int Execute(CommandContext context)
-    {
-        var path = Utils.GetHostsFilePath();
+	public class Settings : CommandSettings
+	{
+		[CommandOption("-j|--json")]
+		public bool Json { get; set; }
+	}
 
-        HostsFile.Read(path, line =>
-        {
-            var m = HostsFile.HostsFileEntryPattern.Match(line);
+	public override int Execute(CommandContext context, Settings settings)
+	{
+		var path = Utils.GetHostsFilePath();
+		var entries = HostsFile.Parse(path);
 
-            if (m.Success)
-            {
-                var isEnabled = !m.Groups[1].Success;
-                var ip = m.Groups[2].Value;
-                var hosts = m.Groups[3].Value;
-                var comment = m.Groups[4].Success ? m.Groups[4].Value[1..] : string.Empty;
+		if (settings.Json)
+		{
+			var json = JsonSerializer.Serialize(entries);
+			Console.WriteLine(json);
+		}
+		else
+		{
+			foreach (var entry in entries)
+			{
+				if (entry.IsEnabled)
+					AnsiConsole.MarkupLine($"  [blue]{entry.IP}[/] {entry.Hosts} [green]{entry.Comment}[/]");
+				else
+					AnsiConsole.MarkupLine($"[red]#[/] [grey]{entry.IP} {entry.Hosts}[/] [green]{entry.Comment}[/]");
+			}
+		}
 
-                if (isEnabled)
-                {
-                    AnsiConsole.MarkupLine($"[green]{ip}[/] [blue]{hosts}[/] {comment}");
-                }
-                else
-                {
-                    AnsiConsole.MarkupLine($"[red]{ip}[/] [blue]{hosts}[/] {comment}");
-                }
-            }
-        });
-
-        return 0;
-    }
+		return 0;
+	}
 }
