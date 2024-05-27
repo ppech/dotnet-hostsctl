@@ -1,0 +1,31 @@
+{
+  "profiles": {
+    "list": {
+      "commandName": "Project",
+      "workingDirectory": "../../samples",
+      "commandLineArgs": "list",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "add": {
+      "commandName": "Project",
+      "workingDirectory": "../../samples",
+      "commandLineArgs": "add moje.xxx",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "remove": {
+      "commandName": "Project",
+      "workingDirectory": "../../samples",
+      "commandLineArgs": "remove moje.xxx 127.0.0.1",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

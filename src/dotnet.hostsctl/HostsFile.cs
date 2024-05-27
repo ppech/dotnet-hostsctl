@@ -29,7 +29,7 @@ internal partial class HostsFile
 		return hosts;
 	}
 
-	public static void Process(string path, Func<HostsFileEntry, HostsFileEntry> processor)
+	public static void Process(string path, Func<HostsFileEntry, HostsFileEntry?> processor)
 	{
 		var regex = HostsFileEntryRegex();
 		var lines = File.ReadAllLines(path);
@@ -58,6 +58,17 @@ internal partial class HostsFile
 		}
 
 		File.WriteAllLines(path, hosts);
+	}
+
+	public static void Append(string path, HostsFileEntry entry)
+	{
+		// append the entry to the end of the file
+		File.AppendAllLines(
+			path,
+			[
+				$"{(entry.IsEnabled ? "" : "##")}{entry.IP} {entry.Hosts}{(string.IsNullOrWhiteSpace(entry.Comment) ? "" : $" #{entry.Comment}")}"
+			]
+		);
 	}
 
 	[GeneratedRegex(@"^([#]{2})?(\d{1,4}\.\d{1,4}\.\d{1,4}\.\d{1,4})\s+([\w\.\s]+)([#][\w\s]+)?$", RegexOptions.Compiled)]

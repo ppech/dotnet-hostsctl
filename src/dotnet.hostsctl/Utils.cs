@@ -19,6 +19,8 @@ internal static class Utils
 
     public static string GetHostsFilePath()
     {
+        return "../samples/hosts";
+
         if (OperatingSystem.IsWindows())
         {
             var windir = Environment.GetEnvironmentVariable("windir");
