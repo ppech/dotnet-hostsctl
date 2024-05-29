@@ -5,9 +5,13 @@ app.Configure(config =>
 {
     config.SetApplicationName("dotnet hostsctl");
     config.SetApplicationVersion("1.0.0");
+    config.AddExample("list", "-i", "../samples/hosts");
+    config.AddExample("backup", "-i", "../samples/hosts", "-o", "../samples/hosts.bak");
+	config.AddExample("restore", "-i", "../samples/hosts.bak", "-o", "../samples/hosts");
+    config.AddExample("add", "app.mydomain.local");
 
 #if DEBUG
-    config.PropagateExceptions();
+	config.PropagateExceptions();
     config.ValidateExamples();
 #endif
 

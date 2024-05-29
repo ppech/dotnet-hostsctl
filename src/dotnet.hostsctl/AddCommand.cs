@@ -33,7 +33,7 @@ internal class AddCommand : Command<AddCommand.Settings>
         var outputFilePath = Utils.GetOutputFilePath(settings);
 
         var entries = HostsFile.Parse(inputFilePath);
-
+		
 		// check if the entry with hosts and ip already exists
 		if (entries.Any(p => p.Hosts.Equals(entry.Hosts, StringComparison.OrdinalIgnoreCase) && p.IP.Equals(entry.IP)))
 		{

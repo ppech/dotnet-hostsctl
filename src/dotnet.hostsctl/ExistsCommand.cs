@@ -5,7 +5,7 @@ using System.Text.Json;
 
 internal class ExistsCommand : Command<ExistsCommand.Settings>
 {
-    public class Settings : InSettingsBase
+    public class Settings : SettingsBase
     {
 		[CommandArgument(0, "<hostname>")]
 		[Description("Host name, ex. app.mydomain.local")]
@@ -17,9 +17,6 @@ internal class ExistsCommand : Command<ExistsCommand.Settings>
 
 		[CommandOption("-a|--all")]
 		public bool All { get; set; }
-
-		[CommandOption("-j|--json")]
-		public bool Json { get; set; }
 	}
 
     public override int Execute(CommandContext context, Settings settings)
@@ -35,21 +32,7 @@ internal class ExistsCommand : Command<ExistsCommand.Settings>
 		if(!settings.All)
 			entries = entries.Where(p => p.IsEnabled);
 
-		if (settings.Json)
-		{
-			var json = JsonSerializer.Serialize(entries);
-			Console.WriteLine(json);
-		}
-		else
-		{
-			foreach (var entry in entries)
-			{
-				if (entry.IsEnabled)
-					AnsiConsole.MarkupLine($"  [blue]{entry.IP}[/] {entry.Hosts} [green]{entry.Comment}[/]");
-				else
-					AnsiConsole.MarkupLine($"[red]#[/] [grey]{entry.IP} {entry.Hosts}[/] [green]{entry.Comment}[/]");
-			}
-		}
+		OutputFormatter.Entries(entries, settings.Json);
 
 		return entries.Any() ? 0 : -1;
 	}

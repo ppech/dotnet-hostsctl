@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 internal class OpenCommand : Command<OpenCommand.Settings>
 {
-    public class Settings : InSettingsBase
+    public class Settings : SettingsBase
     {
     }
 

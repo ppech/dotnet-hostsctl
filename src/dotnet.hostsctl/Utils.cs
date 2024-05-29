@@ -17,7 +17,7 @@ internal static class Utils
         throw new PlatformNotSupportedException();
     }
 
-    public static string GetInputFilePath(InSettingsBase settings, string suffix = "")
+    public static string GetInputFilePath(SettingsBase settings, string suffix = "")
     {
         if (settings.InputFile != null)
         {

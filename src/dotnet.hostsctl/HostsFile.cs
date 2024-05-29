@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-internal partial class HostsFile
+public partial class HostsFile
 {
     public static readonly Regex HostsFileEntryPattern = HostsFileEntryRegex();
 
@@ -75,4 +75,4 @@ internal partial class HostsFile
     private static partial Regex HostsFileEntryRegex();
 }
 
-internal record HostsFileEntry(bool IsEnabled, string IP, string Hosts, string? Comment);
+public record HostsFileEntry(bool IsEnabled, string IP, string Hosts, string? Comment);
