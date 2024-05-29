@@ -8,7 +8,7 @@ internal class AddCommand : Command<AddCommand.Settings>
 	{
 		[CommandArgument(0, "<hostname>")]
 		[Description("Host name, ex. app.mydomain.local")]
-		public required string Hosts { get; set; }
+		public required string HostName { get; set; }
 
 		[CommandArgument(1, "[ip]")]
 		[Description("IP address, default is 127.0.0.1")]
@@ -25,7 +25,7 @@ internal class AddCommand : Command<AddCommand.Settings>
 		(
 			IsEnabled: true,
 			IP: settings.IP ?? "127.0.0.1",
-			Hosts: settings.Hosts,
+			Hosts: settings.HostName,
 			Comment: settings.Comment
 		);
 

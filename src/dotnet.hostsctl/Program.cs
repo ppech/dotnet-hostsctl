@@ -26,20 +26,27 @@ app.Configure(config =>
     config.AddCommand<AddCommand>("add")
         .WithDescription("Adds entry to hosts file")
         .WithExample("add", "app.mydomain.local")
-        .WithExample("add", "app.mydomain.local", "::1");
-        //.WithExample("add", "app.mydomain.local", "-i", "../samples/hosts", "-o", "../samples/hosts.bak");
+        .WithExample("add", "app.mydomain.local", "127.0.0.2");
 
     config.AddCommand<RemoveCommand>("remove")
-        .WithDescription("Removes entry from hosts file");
+        .WithDescription("Removes entry from hosts file")
+		.WithExample("remove", "app.mydomain.local")
+		.WithExample("remove", "app.mydomain.local", "127.0.0.2");
 
     config.AddCommand<EnableCommand>("enable")
-        .WithDescription("Enables entry in hosts file");
+        .WithDescription("Enables entry in hosts file")
+		.WithExample("enable", "app.mydomain.local")
+		.WithExample("enable", "app.mydomain.local", "127.0.0.2");
 
     config.AddCommand<DisableCommand>("disable")
-        .WithDescription("Disables entry in hosts file");
+        .WithDescription("Disables entry in hosts file")
+        .WithExample("disable", "app.mydomain.local")
+		.WithExample("disable", "app.mydomain.local", "127.0.0.2");
 
-    config.AddCommand<ExistsCommand>("exists")
-        .WithDescription("Checks if entry exists in hosts file");
+	config.AddCommand<ExistsCommand>("exists")
+        .WithDescription("Checks if entry exists in hosts file")
+		.WithExample("exists", "app.mydomain.local")
+		.WithExample("exists", "app.mydomain.local", "127.0.0.2");
 
     if (OperatingSystem.IsWindows())
     {

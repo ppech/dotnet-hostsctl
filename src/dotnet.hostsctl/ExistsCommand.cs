@@ -1,13 +1,19 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
+using System.ComponentModel;
 using System.Text.Json;
 
 internal class ExistsCommand : Command<ExistsCommand.Settings>
 {
     public class Settings : InSettingsBase
     {
-		[CommandArgument(0, "[hosts]")]
-		public required string Hosts { get; set; }
+		[CommandArgument(0, "<hostname>")]
+		[Description("Host name, ex. app.mydomain.local")]
+		public required string HostName { get; set; }
+
+		[CommandArgument(1, "[ip]")]
+		[Description("IP address, default is 127.0.0.1")]
+		public string? IP { get; set; }
 
 		[CommandOption("-a|--all")]
 		public bool All { get; set; }
@@ -21,7 +27,10 @@ internal class ExistsCommand : Command<ExistsCommand.Settings>
         var inputFilePath = Utils.GetInputFilePath(settings);
 
         var entries = HostsFile.Parse(inputFilePath)
-			.Where(p => p.Hosts.Contains(settings.Hosts, StringComparison.OrdinalIgnoreCase));
+			.Where(p => p.Hosts.Contains(settings.HostName, StringComparison.OrdinalIgnoreCase));
+
+		if (settings.IP is not null)
+			entries = entries.Where(p => p.IP.Equals(settings.IP));
 
 		if(!settings.All)
 			entries = entries.Where(p => p.IsEnabled);

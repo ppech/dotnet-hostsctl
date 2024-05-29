@@ -1,14 +1,17 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
+using System.ComponentModel;
 
 internal class RemoveCommand : Command<RemoveCommand.Settings>
 {
 	public class Settings : InOutSettingsBase
 	{
-		[CommandArgument(0, "<hosts>")]
-		public required string Hosts { get; set; }
+		[CommandArgument(0, "<hostname>")]
+		[Description("Host name, ex. app.mydomain.local")]
+		public required string HostName { get; set; }
 
 		[CommandArgument(1, "[ip]")]
+		[Description("IP address, default is 127.0.0.1")]
 		public string? IP { get; set; }
 	}
 
@@ -21,7 +24,7 @@ internal class RemoveCommand : Command<RemoveCommand.Settings>
 		{
 			var newEntry = entry;
 
-			if (entry.Hosts.Equals(settings.Hosts, StringComparison.OrdinalIgnoreCase))
+			if (entry.Hosts.Equals(settings.HostName, StringComparison.OrdinalIgnoreCase))
 			{
 				if (settings.IP is null || entry.IP.Equals(settings.IP))
 				{
