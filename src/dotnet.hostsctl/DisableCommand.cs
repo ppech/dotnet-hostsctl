@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 
 internal class DisableCommand : Command<DisableCommand.Settings>
 {
-	public class Settings : CommandSettings
+	public class Settings : InOutSettingsBase
 	{
 		[CommandArgument(0, "[hosts]")]
 		public required string Hosts { get; set; }
@@ -14,9 +14,10 @@ internal class DisableCommand : Command<DisableCommand.Settings>
 
 	public override int Execute(CommandContext context, Settings settings)
     {
-		var path = Utils.GetHostsFilePath();
+        var inputFilePath = Utils.GetInputFilePath(settings);
+        var outputFilePath = Utils.GetOutputFilePath(settings);
 
-		HostsFile.Process(path, entry =>
+        HostsFile.Process(inputFilePath, outputFilePath, entry =>
 		{
 			var newEntry = entry;
 

@@ -1,5 +1,14 @@
 {
   "profiles": {
+    "help": {
+      "commandName": "Project",
+      "workingDirectory": "../../samples",
+      "commandLineArgs": "-h",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
     "list": {
       "commandName": "Project",
       "workingDirectory": "../../samples",

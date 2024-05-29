@@ -1,19 +1,24 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
+using System.ComponentModel;
 
 internal class AddCommand : Command<AddCommand.Settings>
 {
-	public class Settings : CommandSettings
+	public class Settings : InOutSettingsBase
 	{
-		[CommandArgument(0, "<hosts>")]
+		[CommandArgument(0, "<hostname>")]
+		[Description("Host name, ex. app.mydomain.local")]
 		public required string Hosts { get; set; }
 
 		[CommandArgument(1, "[ip]")]
+		[Description("IP address, default is 127.0.0.1")]
 		public string? IP { get; set; }
 
 		[CommandArgument(2, "[comment]")]
+		[Description("Comment for the entry")]
 		public string? Comment { get; set; }
 	}
+
 	public override int Execute(CommandContext context, Settings settings)
 	{
 		var entry = new HostsFileEntry
@@ -24,9 +29,10 @@ internal class AddCommand : Command<AddCommand.Settings>
 			Comment: settings.Comment
 		);
 
-		var path = Utils.GetHostsFilePath();
+        var inputFilePath = Utils.GetInputFilePath(settings);
+        var outputFilePath = Utils.GetOutputFilePath(settings);
 
-		var entries = HostsFile.Parse(path);
+        var entries = HostsFile.Parse(inputFilePath);
 
 		// check if the entry with hosts and ip already exists
 		if (entries.Any(p => p.Hosts.Equals(entry.Hosts, StringComparison.OrdinalIgnoreCase) && p.IP.Equals(entry.IP)))
@@ -35,7 +41,7 @@ internal class AddCommand : Command<AddCommand.Settings>
 			return -1;
 		}
 
-		HostsFile.Append(path, entry);
+		HostsFile.Append(outputFilePath, entry);
 
 		return 0;
 	}

@@ -1,22 +1,27 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 
-internal class RestoreCommand : Command
+internal class RestoreCommand : Command<RestoreCommand.Settings>
 {
-    public override int Execute(CommandContext context)
+    public class Settings : InOutSettingsBase
     {
-        var hostsFilePath = Utils.GetHostsFilePath();
-        var backupFilePath = hostsFilePath + ".bak";
 
-        if (!File.Exists(backupFilePath))
+    }
+
+    public override int Execute(CommandContext context, Settings settings)
+    {
+        var inputFilePath = Utils.GetInputFilePath(settings, ".bak");
+        var outputFilePath = Utils.GetOutputFilePath(settings);
+
+        if (!File.Exists(inputFilePath))
         {
-            AnsiConsole.MarkupLine($"[red]Backup file does not exist at {backupFilePath}[/]");
+            AnsiConsole.MarkupLine($"[red]Backup file does not exist at {inputFilePath}[/]");
             return -1;
         }
 
-        File.Copy(backupFilePath, hostsFilePath, true);
+        File.Copy(inputFilePath, outputFilePath, true);
 
-        AnsiConsole.MarkupLine($"[green]Backup restored from {backupFilePath}[/]");
+        AnsiConsole.MarkupLine($"[green]Backup restored from {inputFilePath} to {outputFilePath}[/]");
 
         return 0;
     }

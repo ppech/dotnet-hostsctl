@@ -17,21 +17,32 @@ internal static class Utils
         throw new PlatformNotSupportedException();
     }
 
-    public static string GetHostsFilePath()
+    public static string GetInputFilePath(InSettingsBase settings, string suffix = "")
     {
-        return "../samples/hosts";
+        if (settings.InputFile != null)
+        {
+            return settings.InputFile;
+        }
 
         if (OperatingSystem.IsWindows())
         {
             var windir = Environment.GetEnvironmentVariable("windir");
-            return windir + @"\System32\drivers\etc\hosts";
+            return windir + @"\System32\drivers\etc\hosts" + suffix;
         }
 
         if (OperatingSystem.IsLinux())
         {
-            return "/etc/hosts";
+            return "/etc/hosts" + suffix;
         }
 
         throw new PlatformNotSupportedException();
+    }
+
+    public static string GetOutputFilePath(InOutSettingsBase settings, string suffix = "")
+    {
+        if (settings.OutputFile != null)
+            return settings.OutputFile;
+
+        return GetInputFilePath(settings) + suffix;
     }
 }

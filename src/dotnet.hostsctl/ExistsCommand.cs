@@ -4,7 +4,7 @@ using System.Text.Json;
 
 internal class ExistsCommand : Command<ExistsCommand.Settings>
 {
-    public class Settings : CommandSettings
+    public class Settings : InSettingsBase
     {
 		[CommandArgument(0, "[hosts]")]
 		public required string Hosts { get; set; }
@@ -18,9 +18,9 @@ internal class ExistsCommand : Command<ExistsCommand.Settings>
 
     public override int Execute(CommandContext context, Settings settings)
     {
-		var path = Utils.GetHostsFilePath();
+        var inputFilePath = Utils.GetInputFilePath(settings);
 
-		var entries = HostsFile.Parse(path)
+        var entries = HostsFile.Parse(inputFilePath)
 			.Where(p => p.Hosts.Contains(settings.Hosts, StringComparison.OrdinalIgnoreCase));
 
 		if(!settings.All)

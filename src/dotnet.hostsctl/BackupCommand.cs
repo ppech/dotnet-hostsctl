@@ -1,16 +1,21 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 
-internal class BackupCommand : Command
+internal class BackupCommand : Command<BackupCommand.Settings>
 {
-    public override int Execute(CommandContext context)
+    public class Settings : InOutSettingsBase
     {
-        var hostsFilePath = Utils.GetHostsFilePath();
-        var backupFilePath = hostsFilePath + ".bak";
 
-        if (File.Exists(backupFilePath))
+    }
+
+    public override int Execute(CommandContext context, Settings settings)
+    {
+        var inputFilePath = Utils.GetInputFilePath(settings);
+        var outputFilePath = Utils.GetOutputFilePath(settings, ".bak");
+
+        if (File.Exists(outputFilePath))
         {
-            AnsiConsole.MarkupLine($"[red]Backup file already exists at {backupFilePath}[/]");
+            AnsiConsole.MarkupLine($"[red]Backup file already exists at {outputFilePath}[/]");
 
             var response = AnsiConsole.Prompt(new ConfirmationPrompt("Do you want to override the existing backup file?"));
 
@@ -20,9 +25,9 @@ internal class BackupCommand : Command
             }
         }
 
-        File.Copy(hostsFilePath, backupFilePath, true);
+        File.Copy(inputFilePath, outputFilePath, true);
 
-        AnsiConsole.MarkupLine($"[green]Backup created at {backupFilePath}[/]");
+        AnsiConsole.MarkupLine($"[green]Backup created at {outputFilePath}[/]");
 
         return 0;
     }

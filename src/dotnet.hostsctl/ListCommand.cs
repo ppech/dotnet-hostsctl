@@ -4,7 +4,7 @@ using System.Text.Json;
 
 internal class ListCommand : Command<ListCommand.Settings>
 {
-	public class Settings : CommandSettings
+	public class Settings : InSettingsBase
 	{
 		[CommandOption("-j|--json")]
 		public bool Json { get; set; }
@@ -12,8 +12,9 @@ internal class ListCommand : Command<ListCommand.Settings>
 
 	public override int Execute(CommandContext context, Settings settings)
 	{
-		var path = Utils.GetHostsFilePath();
-		var entries = HostsFile.Parse(path);
+        var inputFilePath = Utils.GetInputFilePath(settings);
+        
+        var entries = HostsFile.Parse(inputFilePath);
 
 		if (settings.Json)
 		{
