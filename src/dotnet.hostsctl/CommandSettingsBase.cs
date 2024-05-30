@@ -4,7 +4,7 @@ using System.ComponentModel;
 public class SettingsBase : CommandSettings
 {
     [CommandOption("-i|--input <file>")]
-    [Description("Path of input file. For windows is default value '%windir%\\System32\\drivers\\etc\\hosts' and for linux is '/etc/hosts'")]
+    [Description("Path of input file, default value depends on operating system")]
 
     public string? InputFile { get; set; }
 
@@ -16,6 +16,6 @@ public class SettingsBase : CommandSettings
 public class InOutSettingsBase : SettingsBase
 {
     [CommandOption("-o|--output <file>")]
-    [Description("Path of output file. Default value is same as --input option")]
+    [Description("Path of output file, default value is same as input file")]
     public string? OutputFile { get; set; }
 }

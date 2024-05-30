@@ -19,6 +19,7 @@ public class ExistsCommand : Command<ExistsCommand.Settings>
 		public string? IP { get; set; }
 
 		[CommandOption("-a|--all")]
+		[Description("Include disabled entries")]
 		public bool All { get; set; }
 	}
 
