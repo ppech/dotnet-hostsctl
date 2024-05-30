@@ -1,4 +1,7 @@
 # `hostsctl`
+    
+[![NuGet](https://img.shields.io/nuget/v/ppech.dotnet.hostsctl)](https://www.nuget.org/packages/ppech.dotnet.hostsctl/)
+[![License](https://img.shields.io/github/license/ppech/dotnet-hostsctl)](LICENSE)
 
 `hostsctl` is a command-line tool for managing your system's hosts file. It provides commands for:
 - list entries
