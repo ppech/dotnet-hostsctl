@@ -16,6 +16,7 @@
     <RepositoryUrl>https://github.com/ppech/dotnet-hostsctl</RepositoryUrl>
     <PackageTags>cli;tool;dotnet;hosts;hostsfile;hosts-file</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
