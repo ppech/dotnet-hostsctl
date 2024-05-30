@@ -23,6 +23,8 @@ public class EnableCommand : Command<EnableCommand.Settings>
         var inputFilePath = Utils.GetInputFilePath(settings);
         var outputFilePath = Utils.GetOutputFilePath(settings);
 
+		var list = new List<HostsFileEntry>();
+
         HostsFile.Process(inputFilePath, outputFilePath, entry =>
 		{
 			var newEntry = entry;
@@ -34,13 +36,23 @@ public class EnableCommand : Command<EnableCommand.Settings>
 					if (settings.IP is null || entry.IP.Equals(settings.IP))
 					{
 						newEntry = entry with { IsEnabled = true };
-						AnsiConsole.MarkupLine($"  [blue]{entry.IP}[/] {entry.Hosts} [green]{entry.Comment}[/]");
+						list.Add(newEntry);
 					}
 				}
 			}
 
 			return newEntry;
 		});
+
+		if (list.Count == 0)
+		{
+			AnsiConsole.MarkupLine($"[red]Entry with HostName '{settings.HostName}' and IP '{settings.IP}' not found or is already enabled[/]");
+			return -1;
+		}
+		else
+		{
+			OutputFormatter.Entries(list, settings.Json);
+		}
 
 		return 0;
 	}

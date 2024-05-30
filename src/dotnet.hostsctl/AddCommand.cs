@@ -36,15 +36,17 @@ public class AddCommand : Command<AddCommand.Settings>
         var outputFilePath = Utils.GetOutputFilePath(settings);
 
         var entries = HostsFile.Parse(inputFilePath);
-		
+
 		// check if the entry with hosts and ip already exists
 		if (entries.Any(p => p.Hosts.Equals(entry.Hosts, StringComparison.OrdinalIgnoreCase) && p.IP.Equals(entry.IP)))
 		{
-			AnsiConsole.MarkupLine($"[red]Entry with hosts '{entry.Hosts}' and IP '{entry.IP}' already exists[/]");
+			AnsiConsole.MarkupLine($"[red]Entry with HostName '{entry.Hosts}' and IP '{entry.IP}' already exists[/]");
 			return -1;
 		}
 
 		HostsFile.Append(outputFilePath, entry);
+
+		OutputFormatter.Entry(entry, settings.Json);
 
 		return 0;
 	}

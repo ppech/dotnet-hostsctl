@@ -23,21 +23,31 @@ public class RemoveCommand : Command<RemoveCommand.Settings>
         var inputFilePath = Utils.GetInputFilePath(settings);
         var outputFilePath = Utils.GetOutputFilePath(settings);
 
+		var list = new List<HostsFileEntry>();
+
         HostsFile.Process(inputFilePath, outputFilePath, entry =>
 		{
-			var newEntry = entry;
-
 			if (entry.Hosts.Equals(settings.HostName, StringComparison.OrdinalIgnoreCase))
 			{
 				if (settings.IP is null || entry.IP.Equals(settings.IP))
 				{
-					newEntry = null;
-					AnsiConsole.MarkupLine($"[red]-  {entry.IP}[/] {entry.Hosts} [green]{entry.Comment}[/]");
+					list.Add(entry);
+					return null;
 				}
 			}
 
-			return newEntry;
+			return entry;
 		});
+
+		if (list.Count == 0)
+		{
+			AnsiConsole.MarkupLine($"[red]Entry with HostName '{settings.HostName}' and IP '{settings.IP}' not found[/]");
+			return -1;
+		}
+		else
+		{
+			OutputFormatter.Entries(list, settings.Json);
+		}
 
 		return 0;
 	}

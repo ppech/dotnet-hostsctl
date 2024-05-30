@@ -3,28 +3,39 @@ using System.Text.Json;
 
 public static class OutputFormatter
 {
+	private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+	{
+		WriteIndented = true
+	};
+
+	public static void Entry(HostsFileEntry entry, bool json)
+	{
+		if (json)
+		{
+			PrintJson([entry]);
+		}
+		else
+		{
+			PrintRow(entry);
+		}
+	}
+
 	public static void Entries(IEnumerable<HostsFileEntry> entries, bool json)
 	{
 		if (json)
 		{
-			Json(entries);
+			PrintJson(entries);
 		}
 		else
 		{
 			foreach (var entry in entries)
 			{
-				Entry(entry);
+				PrintRow(entry);
 			}
 		}
 	}
 
-	public static void Json(IEnumerable<HostsFileEntry> entries)
-	{
-		var json = JsonSerializer.Serialize(entries);
-		Console.WriteLine(json);
-	}
-
-	public static void Entry(HostsFileEntry entry)
+	private static void PrintRow(HostsFileEntry entry)
 	{
 		if (entry.IsEnabled)
 			AnsiConsole.MarkupLine($"  [blue]{entry.IP}[/] {entry.Hosts} [green]{entry.Comment}[/]");
@@ -32,8 +43,9 @@ public static class OutputFormatter
 			AnsiConsole.MarkupLine($"[red]#[/] [grey]{entry.IP} {entry.Hosts}[/] [green]{entry.Comment}[/]");
 	}
 
-	public static void Removed(HostsFileEntry entry)
+	private static void PrintJson(IEnumerable<HostsFileEntry> entries)
 	{
-		//AnsiConsole.MarkupLine($"[red]-  {ip}[/] {host} [green]{comment}[/]");
+		var json = JsonSerializer.Serialize(entries, jsonOptions);
+		Console.WriteLine(json);
 	}
 }

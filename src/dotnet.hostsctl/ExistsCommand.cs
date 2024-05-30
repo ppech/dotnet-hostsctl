@@ -35,8 +35,14 @@ public class ExistsCommand : Command<ExistsCommand.Settings>
 		if(!settings.All)
 			entries = entries.Where(p => p.IsEnabled);
 
+		if (!entries.Any())
+		{
+			AnsiConsole.MarkupLine($"[red]Entry with HostName '{settings.HostName}' and IP '{settings.IP}' not found[/]");
+			return -1;
+		}
+
 		OutputFormatter.Entries(entries, settings.Json);
 
-		return entries.Any() ? 0 : -1;
+		return 0;
 	}
 }
