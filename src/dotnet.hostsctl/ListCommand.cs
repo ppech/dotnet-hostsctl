@@ -3,7 +3,10 @@ using Spectre.Console.Cli;
 using System.ComponentModel;
 using System.Text.Json;
 
-internal class ListCommand : Command<ListCommand.Settings>
+/// <summary>
+/// List the entries in the hosts file.
+/// </summary>
+public class ListCommand : Command<ListCommand.Settings>
 {
 	public class Settings : SettingsBase
 	{

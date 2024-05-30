@@ -1,7 +1,10 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 
-internal class BackupCommand : Command<BackupCommand.Settings>
+/// <summary>
+/// Backups the hosts file
+/// </summary>
+public class BackupCommand : Command<BackupCommand.Settings>
 {
     public class Settings : InOutSettingsBase
     {

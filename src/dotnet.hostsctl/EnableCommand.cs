@@ -2,7 +2,10 @@
 using Spectre.Console.Cli;
 using System.ComponentModel;
 
-internal class EnableCommand : Command<EnableCommand.Settings>
+/// <summary>
+/// Enables entry in hosts file
+/// </summary>
+public class EnableCommand : Command<EnableCommand.Settings>
 {
 	public class Settings : InOutSettingsBase
 	{

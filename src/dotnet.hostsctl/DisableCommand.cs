@@ -2,7 +2,10 @@
 using Spectre.Console.Cli;
 using System.ComponentModel;
 
-internal class DisableCommand : Command<DisableCommand.Settings>
+/// <summary>
+/// Disables entry in hosts file
+/// </summary>
+public class DisableCommand : Command<DisableCommand.Settings>
 {
 	public class Settings : InOutSettingsBase
 	{

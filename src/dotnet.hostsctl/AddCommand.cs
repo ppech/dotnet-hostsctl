@@ -2,7 +2,10 @@
 using Spectre.Console.Cli;
 using System.ComponentModel;
 
-internal class AddCommand : Command<AddCommand.Settings>
+/// <summary>
+/// Adds entry to the hosts file
+/// </summary>
+public class AddCommand : Command<AddCommand.Settings>
 {
 	public class Settings : InOutSettingsBase
 	{

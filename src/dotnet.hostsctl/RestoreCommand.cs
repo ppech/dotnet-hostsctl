@@ -1,7 +1,10 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 
-internal class RestoreCommand : Command<RestoreCommand.Settings>
+/// <summary>
+/// Restores the hosts file from a backup
+/// </summary>
+public class RestoreCommand : Command<RestoreCommand.Settings>
 {
     public class Settings : InOutSettingsBase
     {

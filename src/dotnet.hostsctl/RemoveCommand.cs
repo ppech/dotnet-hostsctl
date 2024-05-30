@@ -2,7 +2,10 @@
 using Spectre.Console.Cli;
 using System.ComponentModel;
 
-internal class RemoveCommand : Command<RemoveCommand.Settings>
+/// <summary>
+/// Removes entry from hosts file
+/// </summary>
+public class RemoveCommand : Command<RemoveCommand.Settings>
 {
 	public class Settings : InOutSettingsBase
 	{

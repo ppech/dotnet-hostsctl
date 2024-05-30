@@ -3,7 +3,10 @@ using Spectre.Console.Cli;
 using System.ComponentModel;
 using System.Text.Json;
 
-internal class ExistsCommand : Command<ExistsCommand.Settings>
+/// <summary>
+/// Checks if entry exists in hosts file
+/// </summary>
+public class ExistsCommand : Command<ExistsCommand.Settings>
 {
     public class Settings : SettingsBase
     {

@@ -16,19 +16,19 @@ app.Configure(config =>
 #endif
 
     config.AddCommand<ListCommand>("list")
-        .WithDescription("Prints hosts entries")
+        .WithDescription("List the entries in the hosts file")
         .WithExample("list", "-i", "../samples/hosts");
 
     config.AddCommand<BackupCommand>("backup")
-        .WithDescription("Backup hosts file")
+        .WithDescription("Backups the hosts file")
         .WithExample("backup", "-i", "../samples/hosts", "-o", "../samples/hosts.bak");
 
     config.AddCommand<RestoreCommand>("restore")
-        .WithDescription("Restore hosts file from backup")
+        .WithDescription("Restores the hosts file from a backup")
         .WithExample("restore", "-i", "../samples/hosts.bak", "-o", "../samples/hosts");
 
     config.AddCommand<AddCommand>("add")
-        .WithDescription("Adds entry to hosts file")
+        .WithDescription("Adds entry to the hosts file")
         .WithExample("add", "app.mydomain.local")
         .WithExample("add", "app.mydomain.local", "127.0.0.2");
 
