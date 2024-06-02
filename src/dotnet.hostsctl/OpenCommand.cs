@@ -1,11 +1,15 @@
 ﻿using Spectre.Console.Cli;
+using System.ComponentModel;
 using System.Diagnostics;
 
 internal class OpenCommand : Command<OpenCommand.Settings>
 {
-    public class Settings : SettingsBase
-    {
-    }
+    public class Settings : CommandSettings, IInputFileSettings
+	{
+		[CommandOption("-i|--input <file>")]
+		[Description("Path of input file, default value depends on operating system")]
+		public string? InputFile { get; set; }
+	}
 
     public override int Execute(CommandContext context, Settings settings)
     {

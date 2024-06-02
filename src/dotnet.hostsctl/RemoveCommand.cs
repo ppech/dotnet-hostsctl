@@ -7,15 +7,9 @@ using System.ComponentModel;
 /// </summary>
 public class RemoveCommand : Command<RemoveCommand.Settings>
 {
-	public class Settings : InOutSettingsBase
+	public class Settings : HostsEntrySettingsBase
 	{
-		[CommandArgument(0, "<hostname>")]
-		[Description("Host name, ex. app.mydomain.local")]
-		public required string HostName { get; set; }
 
-		[CommandArgument(1, "[ip]")]
-		[Description("IP address, default is 127.0.0.1")]
-		public string? IP { get; set; }
 	}
 
 	public override int Execute(CommandContext context, Settings settings)

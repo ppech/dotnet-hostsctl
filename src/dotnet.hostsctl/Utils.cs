@@ -17,7 +17,7 @@ internal static class Utils
         throw new PlatformNotSupportedException();
     }
 
-    public static string GetInputFilePath(SettingsBase settings, string suffix = "")
+    public static string GetInputFilePath(IInputFileSettings settings, string suffix = "")
     {
         if (settings.InputFile != null)
         {
@@ -38,7 +38,7 @@ internal static class Utils
         throw new PlatformNotSupportedException();
     }
 
-    public static string GetOutputFilePath(InOutSettingsBase settings, string suffix = "")
+    public static string GetOutputFilePath(HostsSettingsBase settings, string suffix = "")
     {
         if (settings.OutputFile != null)
             return settings.OutputFile;

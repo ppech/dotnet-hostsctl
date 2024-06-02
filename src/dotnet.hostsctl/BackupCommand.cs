@@ -6,8 +6,8 @@ using Spectre.Console.Cli;
 /// </summary>
 public class BackupCommand : Command<BackupCommand.Settings>
 {
-    public class Settings : InOutSettingsBase
-    {
+    public class Settings : HostsSettingsBase
+	{
 
     }
 

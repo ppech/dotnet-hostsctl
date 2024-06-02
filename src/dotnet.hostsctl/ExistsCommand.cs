@@ -8,16 +8,8 @@ using System.Text.Json;
 /// </summary>
 public class ExistsCommand : Command<ExistsCommand.Settings>
 {
-    public class Settings : SettingsBase
-    {
-		[CommandArgument(0, "<hostname>")]
-		[Description("Host name, ex. app.mydomain.local")]
-		public required string HostName { get; set; }
-
-		[CommandArgument(1, "[ip]")]
-		[Description("IP address, default is 127.0.0.1")]
-		public string? IP { get; set; }
-
+    public class Settings : HostsEntrySettingsBase
+	{
 		[CommandOption("-a|--all")]
 		[Description("Include disabled entries")]
 		public bool All { get; set; }
