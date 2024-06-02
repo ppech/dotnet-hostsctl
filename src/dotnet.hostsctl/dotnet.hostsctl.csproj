@@ -10,6 +10,7 @@
 		<PackageOutputPath>../../publish/</PackageOutputPath>
     <PackageId>ppech.dotnet.hostsctl</PackageId>
 		<Authors>ppech</Authors>
+    <Copyright>Copyright (C) Pavel Pech. All rights reserved.</Copyright>
     <Version>1.0.0</Version>
     <Description>Easily manage the hosts file using the .net command-line tool</Description>
     <PackageProjectUrl>https://github.com/ppech/dotnet-hostsctl</PackageProjectUrl>
@@ -17,6 +18,7 @@
     <PackageTags>cli;tool;dotnet;hosts;hostsfile;hosts-file</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 
 	<ItemGroup>
