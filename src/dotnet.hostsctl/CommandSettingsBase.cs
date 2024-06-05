@@ -31,3 +31,10 @@ public class HostsEntrySettingsBase : HostsSettingsBase
 	[Description("Output as JSON")]
 	public bool Json { get; set; }
 }
+
+public class TemplateSettings : CommandSettings
+{
+	[CommandOption("-t|--template <template>")]
+	[Description("Template filename, default is hosts.ht in current folder")]
+	public string? TemplatePath { get; set; }
+}

@@ -18,31 +18,36 @@ internal static class Utils
     }
 
     public static string GetInputFilePath(IInputFileSettings settings, string suffix = "")
-    {
-        if (settings.InputFile != null)
-        {
-            return settings.InputFile;
-        }
+	{
+		if (settings.InputFile != null)
+		{
+			return settings.InputFile;
+		}
 
-        if (OperatingSystem.IsWindows())
-        {
-            var windir = Environment.GetEnvironmentVariable("windir");
-            return windir + @"\System32\drivers\etc\hosts" + suffix;
-        }
+		return GetSystemFilePath(suffix);
+	}
 
-        if (OperatingSystem.IsLinux())
-        {
-            return "/etc/hosts" + suffix;
-        }
-
-        throw new PlatformNotSupportedException();
-    }
-
-    public static string GetOutputFilePath(HostsSettingsBase settings, string suffix = "")
+	public static string GetOutputFilePath(HostsSettingsBase settings, string suffix = "")
     {
         if (settings.OutputFile != null)
             return settings.OutputFile;
 
         return GetInputFilePath(settings) + suffix;
     }
+
+	public static string GetSystemFilePath(string suffix = "")
+	{
+		if (OperatingSystem.IsWindows())
+		{
+			var windir = Environment.GetEnvironmentVariable("windir");
+			return windir + @"\System32\drivers\etc\hosts" + suffix;
+		}
+
+		if (OperatingSystem.IsLinux())
+		{
+			return "/etc/hosts" + suffix;
+		}
+
+		throw new PlatformNotSupportedException();
+	}
 }
