@@ -1,78 +1,85 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.IO.Abstractions;
+using System.Text.RegularExpressions;
 
-public partial class HostsFile
+public interface IHostsFile
 {
-    public static readonly Regex HostsFileEntryPattern = HostsFileEntryRegex();
+	void Append(IFileInfo file, HostsFileEntry entry);
+	List<HostsFileEntry> Parse(IFileInfo fileInfo);
+	void Process(IFileInfo inputFile, IFileInfo outputFile, Func<HostsFileEntry, HostsFileEntry?> processor);
+}
 
-    public static List<HostsFileEntry> Parse(string path)
-    {
-        var regex = HostsFileEntryRegex();
-        var hosts = new List<HostsFileEntry>();
+public partial class HostsFile : IHostsFile
+{
+	public static readonly Regex HostsFileEntryPattern = HostsFileEntryRegex();
 
-        var lines = File.ReadAllLines(path);
-        foreach (var line in lines)
-        {
-            var m = regex.Match(line);
+	public void Append(IFileInfo file, HostsFileEntry entry)
+	{
+		// append the entry to the end of the file
+		file.AppendAllLines(
+			[
+				$"{(entry.IsEnabled ? "" : "##")}{entry.IP} {entry.Hosts}{(string.IsNullOrWhiteSpace(entry.Comment) ? "" : $" #{entry.Comment}")}"
+			]
+		);
+	}
 
-            if (!m.Success)
-                continue;
+	public List<HostsFileEntry> Parse(IFileInfo fileInfo)
+	{
+		var regex = HostsFileEntryRegex();
+		var hosts = new List<HostsFileEntry>();
 
-            var entry = new HostsFileEntry(
-                !m.Groups[1].Success,
-                m.Groups[2].Value.Trim(),
-                m.Groups[3].Value.Trim(),
-                m.Groups[4].Success ? m.Groups[4].Value.Substring(1).Trim() : null);
+		var lines = fileInfo.ReadAllLines();
+		foreach (var line in lines)
+		{
+			var m = regex.Match(line);
 
-            hosts.Add(entry);
-        }
+			if (!m.Success)
+				continue;
 
-        return hosts;
-    }
+			var entry = new HostsFileEntry(
+				!m.Groups[1].Success,
+				m.Groups[2].Value.Trim(),
+				m.Groups[3].Value.Trim(),
+				m.Groups[4].Success ? m.Groups[4].Value.Substring(1).Trim() : null);
 
-    public static void Process(string inputFilePath, string outputFilePath, Func<HostsFileEntry, HostsFileEntry?> processor)
-    {
-        var regex = HostsFileEntryRegex();
-        var lines = File.ReadAllLines(inputFilePath);
-        var hosts = new List<string>();
+			hosts.Add(entry);
+		}
 
-        foreach (var line in lines)
-        {
-            var m = regex.Match(line);
+		return hosts;
+	}
 
-            if (!m.Success)
-            {
-                hosts.Add(line);
-                continue;
-            }
+	public void Process(IFileInfo inputFile, IFileInfo outputFile, Func<HostsFileEntry, HostsFileEntry?> processor)
+	{
+		var regex = HostsFileEntryRegex();
+		var lines = inputFile.ReadAllLines();
+		var hosts = new List<string>();
 
-            var entry = new HostsFileEntry(
-                !m.Groups[1].Success,
-                m.Groups[2].Value.Trim(),
-                m.Groups[3].Value.Trim(),
-                m.Groups[4].Success ? m.Groups[4].Value.Substring(1).Trim() : null);
+		foreach (var line in lines)
+		{
+			var m = regex.Match(line);
 
-            var processed = processor(entry);
+			if (!m.Success)
+			{
+				hosts.Add(line);
+				continue;
+			}
 
-            if (processed is not null)
-                hosts.Add($"{(processed.IsEnabled ? "" : "##")}{processed.IP} {processed.Hosts}{(processed.Comment != null ? $" #{processed.Comment}" : "")}");
-        }
+			var entry = new HostsFileEntry(
+				!m.Groups[1].Success,
+				m.Groups[2].Value.Trim(),
+				m.Groups[3].Value.Trim(),
+				m.Groups[4].Success ? m.Groups[4].Value.Substring(1).Trim() : null);
 
-        File.WriteAllLines(outputFilePath, hosts);
-    }
+			var processed = processor(entry);
 
-    public static void Append(string path, HostsFileEntry entry)
-    {
-        // append the entry to the end of the file
-        File.AppendAllLines(
-            path,
-            [
-                $"{(entry.IsEnabled ? "" : "##")}{entry.IP} {entry.Hosts}{(string.IsNullOrWhiteSpace(entry.Comment) ? "" : $" #{entry.Comment}")}"
-            ]
-        );
-    }
+			if (processed is not null)
+				hosts.Add($"{(processed.IsEnabled ? "" : "##")}{processed.IP} {processed.Hosts}{(processed.Comment != null ? $" #{processed.Comment}" : "")}");
+		}
 
-    [GeneratedRegex(@"^([#]{2})?(\d{1,4}\.\d{1,4}\.\d{1,4}\.\d{1,4})\s+([\w\.\s]+)([#][\w\s]+)?$", RegexOptions.Compiled)]
-    private static partial Regex HostsFileEntryRegex();
+		outputFile.WriteAllLines(hosts);
+	}
+
+	[GeneratedRegex(@"^([#]{2})?(\d{1,4}\.\d{1,4}\.\d{1,4}\.\d{1,4})\s+([\w\.\s]+)([#][\w\s]+)?$", RegexOptions.Compiled)]
+	private static partial Regex HostsFileEntryRegex();
 }
 
 public record HostsFileEntry(bool IsEnabled, string IP, string Hosts, string? Comment);

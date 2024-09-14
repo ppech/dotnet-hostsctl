@@ -1,14 +1,20 @@
 ﻿using Spectre.Console;
 using System.Text.Json;
 
-public static class OutputFormatter
+public interface IOutputFormatter
+{
+	void Entry(HostsFileEntry entry, bool json);
+	void Entries(IEnumerable<HostsFileEntry> entries, bool json);
+}
+
+public class ConsoleOutputFormatter : IOutputFormatter
 {
 	private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions
 	{
 		WriteIndented = true
 	};
 
-	public static void Entry(HostsFileEntry entry, bool json)
+	public void Entry(HostsFileEntry entry, bool json)
 	{
 		if (json)
 		{
@@ -20,7 +26,7 @@ public static class OutputFormatter
 		}
 	}
 
-	public static void Entries(IEnumerable<HostsFileEntry> entries, bool json)
+	public void Entries(IEnumerable<HostsFileEntry> entries, bool json)
 	{
 		if (json)
 		{
@@ -35,7 +41,7 @@ public static class OutputFormatter
 		}
 	}
 
-	private static void PrintRow(HostsFileEntry entry)
+	private void PrintRow(HostsFileEntry entry)
 	{
 		if (entry.IsEnabled)
 			AnsiConsole.MarkupLine($"  [blue]{entry.IP}[/] {entry.Hosts} [green]{entry.Comment}[/]");
@@ -43,7 +49,7 @@ public static class OutputFormatter
 			AnsiConsole.MarkupLine($"[red]#[/] [grey]{entry.IP} {entry.Hosts}[/] [green]{entry.Comment}[/]");
 	}
 
-	private static void PrintJson(IEnumerable<HostsFileEntry> entries)
+	private void PrintJson(IEnumerable<HostsFileEntry> entries)
 	{
 		var json = JsonSerializer.Serialize(entries, jsonOptions);
 		Console.WriteLine(json);

@@ -2,9 +2,14 @@
 using Spectre.Console.Cli;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO.Abstractions;
 
 public class TemplateApplyCommand : Command<TemplateApplyCommand.Settings>
 {
+	private readonly IFileSystem fileSystem;
+	private readonly IHostsFile hostsFile;
+	private readonly IOutputFormatter outputFormatter;
+
 	public class Settings : TemplateSettings
 	{
 		[CommandOption("-o|--output <OUTPUT>")]
@@ -16,6 +21,13 @@ public class TemplateApplyCommand : Command<TemplateApplyCommand.Settings>
 		public bool Json { get; set; }
 	}
 
+	public TemplateApplyCommand(IFileSystem fileSystem, IHostsFile hostsFile, IOutputFormatter outputFormatter)
+	{
+		this.fileSystem = fileSystem;
+		this.hostsFile = hostsFile;
+		this.outputFormatter = outputFormatter;
+	}
+
 	public override int Execute(CommandContext context, Settings settings)
 	{
 		var filename = "hosts.ht";
@@ -23,24 +35,27 @@ public class TemplateApplyCommand : Command<TemplateApplyCommand.Settings>
 		if (!string.IsNullOrWhiteSpace(settings.TemplatePath))
 			filename = settings.TemplatePath;
 
-		filename = Path.GetFullPath(filename);
+		filename = fileSystem.Path.GetFullPath(filename);
 
-		if (!File.Exists(filename))
+		if (!fileSystem.File.Exists(filename))
 		{
 			AnsiConsole.MarkupLine($"[red]Template file not found at {filename}[/]");
 			return -1;
 		}
 
-		var newEntries = HostsFile.Parse(filename);
+		var f = fileSystem.FileInfo.New(filename);
 
-		var outputFile = Utils.GetSystemFilePath();
+		var newEntries = hostsFile.Parse(f);
+
+		var outputFileName = Utils.GetSystemFilePath();
 
 		if(!string.IsNullOrWhiteSpace(settings.OutputFile))
 		{
-			outputFile = settings.OutputFile;
+			outputFileName = settings.OutputFile;
 		}
 
-		var currentEntries = HostsFile.Parse(outputFile);
+		var outputFile = fileSystem.FileInfo.New(outputFileName);
+		var currentEntries = hostsFile.Parse(outputFile);
 
 		var addedEntries = new List<HostsFileEntry>();
 
@@ -49,11 +64,11 @@ public class TemplateApplyCommand : Command<TemplateApplyCommand.Settings>
 			if (!currentEntries.Any(p => p.Hosts.Equals(entry.Hosts, StringComparison.OrdinalIgnoreCase) && p.IP.Equals(entry.IP)))
 			{
 				addedEntries.Add(entry);
-				HostsFile.Append(outputFile, entry);
+				hostsFile.Append(outputFile, entry);
 			}
 		}
 
-		OutputFormatter.Entries(addedEntries, settings.Json);
+		outputFormatter.Entries(addedEntries, settings.Json);
 
 		return 0;
 	}

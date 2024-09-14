@@ -1,8 +1,13 @@
 ﻿using Spectre.Console.Cli;
+using System.IO.Abstractions;
 
 var app = new CommandApp();
 app.Configure(config =>
 {
+	config.Settings.Registrar.Register<IFileSystem, FileSystem>();
+	config.Settings.Registrar.Register<IHostsFile, HostsFile>();
+	config.Settings.Registrar.Register<IOutputFormatter, ConsoleOutputFormatter>();
+
 	config.SetApplicationName("dotnet hostsctl");
 	config.SetApplicationVersion("1.0.0");
 	config.AddExample("list", "-i", "../samples/hosts");
@@ -18,7 +23,7 @@ app.Configure(config =>
 	config.AddBranch("template", p =>
 		{
 			p.AddCommand<TemplateNewCommand>("new")
-				.WithDescription("Creates new template file")
+				.WithDescription("Creates a new template file")
 				.WithExample("template", "new")
 				.WithExample("template", "new", "--template", "hosts.Staging.ht");
 

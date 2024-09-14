@@ -1,15 +1,27 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
+using System.IO.Abstractions;
 
 /// <summary>
 /// Disables entry in hosts file
 /// </summary>
 public class DisableCommand : Command<DisableCommand.Settings>
 {
+	private readonly IFileSystem fileSystem;
+	private readonly IHostsFile hostsFile;
+	private readonly IOutputFormatter outputFormatter;
+
 	public class Settings : HostsEntrySettingsBase
 	{
 
+	}
+
+	public DisableCommand(IFileSystem fileSystem, IHostsFile hostsFile, IOutputFormatter outputFormatter)
+	{
+		this.fileSystem = fileSystem;
+		this.hostsFile = hostsFile;
+		this.outputFormatter = outputFormatter;
 	}
 
 	public override int Execute(CommandContext context, Settings settings)
@@ -19,7 +31,10 @@ public class DisableCommand : Command<DisableCommand.Settings>
 
 		var list = new List<HostsFileEntry>();
 
-        HostsFile.Process(inputFilePath, outputFilePath, entry =>
+		var inputFile = fileSystem.FileInfo.New(inputFilePath);
+		var outputFile = fileSystem.FileInfo.New(outputFilePath);
+
+        hostsFile.Process(inputFile, outputFile, entry =>
 		{
 			var newEntry = entry;
 
@@ -45,7 +60,7 @@ public class DisableCommand : Command<DisableCommand.Settings>
 		}
 		else
 		{
-			OutputFormatter.Entries(list, settings.Json);
+			outputFormatter.Entries(list, settings.Json);
 		}
 
 		return 0;

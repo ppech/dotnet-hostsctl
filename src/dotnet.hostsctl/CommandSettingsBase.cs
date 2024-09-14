@@ -35,6 +35,6 @@ public class HostsEntrySettingsBase : HostsSettingsBase
 public class TemplateSettings : CommandSettings
 {
 	[CommandOption("-t|--template <template>")]
-	[Description("Template filename, default is hosts.ht in current folder")]
+	[Description("Path of template file, default value is hosts.ht in working directory")]
 	public string? TemplatePath { get; set; }
 }

@@ -1,9 +1,14 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
+using System.IO.Abstractions;
 
 public class TemplateAddCommand : Command<TemplateAddCommand.Settings>
 {
+	private readonly IFileSystem fileSystem;
+	private readonly IHostsFile hostsFile;
+	private readonly IOutputFormatter outputFormatter;
+
 	public class Settings : TemplateSettings
 	{
 		[CommandArgument(0, "<hostname>")]
@@ -23,6 +28,13 @@ public class TemplateAddCommand : Command<TemplateAddCommand.Settings>
 		public bool Json { get; set; }
 	}
 
+	public TemplateAddCommand(IFileSystem fileSystem, IHostsFile hostsFile, IOutputFormatter outputFormatter)
+	{
+		this.fileSystem = fileSystem;
+		this.hostsFile = hostsFile;
+		this.outputFormatter = outputFormatter;
+	}
+
 	public override int Execute(CommandContext context, Settings settings)
 	{
 		var filename = "hosts.ht";
@@ -30,9 +42,9 @@ public class TemplateAddCommand : Command<TemplateAddCommand.Settings>
 		if (!string.IsNullOrWhiteSpace(settings.TemplatePath))
 			filename = settings.TemplatePath;
 
-		filename = Path.GetFullPath(filename);
+		filename = fileSystem.Path.GetFullPath(filename);
 
-		if (!File.Exists(filename))
+		if (!fileSystem.File.Exists(filename))
 		{
 			AnsiConsole.MarkupLine($"[red]Template file not found at {filename}[/]");
 			return -1;
@@ -46,7 +58,9 @@ public class TemplateAddCommand : Command<TemplateAddCommand.Settings>
 			Comment: settings.Comment
 		);
 
-		var entries = HostsFile.Parse(filename);
+		var f = fileSystem.FileInfo.New(filename);
+
+		var entries = hostsFile.Parse(f);
 
 		// check if the entry with hosts and ip already exists
 		if (entries.Any(p => p.Hosts.Equals(entry.Hosts, StringComparison.OrdinalIgnoreCase) && p.IP.Equals(entry.IP)))
@@ -55,9 +69,9 @@ public class TemplateAddCommand : Command<TemplateAddCommand.Settings>
 			return -2;
 		}
 
-		HostsFile.Append(filename, entry);
+		hostsFile.Append(f, entry);
 
-		OutputFormatter.Entry(entry, settings.Json);
+		outputFormatter.Entry(entry, settings.Json);
 
 		return 0;
 	}

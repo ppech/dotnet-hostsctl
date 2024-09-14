@@ -1,10 +1,18 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
+using System.IO.Abstractions;
 
 public class TemplateNewCommand : Command<TemplateNewCommand.Settings>
 {
+	private readonly IFileSystem fileSystem;
+
 	public class Settings : TemplateSettings
 	{
+	}
+
+	public TemplateNewCommand(IFileSystem fileSystem)
+	{
+		this.fileSystem = fileSystem;
 	}
 
 	public override int Execute(CommandContext context, Settings settings)
@@ -25,15 +33,15 @@ public class TemplateNewCommand : Command<TemplateNewCommand.Settings>
 		if(!string.IsNullOrWhiteSpace(settings.TemplatePath))
 			filename = settings.TemplatePath;
 
-		filename = Path.GetFullPath(filename);
+		filename = fileSystem.Path.GetFullPath(filename);
 
-		if(System.IO.File.Exists(filename))
+		if(fileSystem.File.Exists(filename))
 		{
 			AnsiConsole.MarkupLine($"[red]Template file already exists at {filename}[/]");
 			return -1;
 		}
 
-		System.IO.File.WriteAllText(filename, lines);
+		fileSystem.File.WriteAllText(filename, lines);
 
 		AnsiConsole.MarkupLine($"[green]Template file created at {filename}[/]");
 

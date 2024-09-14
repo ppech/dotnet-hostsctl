@@ -1,22 +1,30 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
+using System.IO.Abstractions;
 
 /// <summary>
 /// Backups the hosts file
 /// </summary>
 public class BackupCommand : Command<BackupCommand.Settings>
 {
-    public class Settings : HostsSettingsBase
+	private readonly IFileSystem fileSystem;
+
+	public class Settings : HostsSettingsBase
 	{
 
     }
+
+    public BackupCommand(IFileSystem fileSystem)
+    {
+		this.fileSystem = fileSystem;
+	}
 
     public override int Execute(CommandContext context, Settings settings)
     {
         var inputFilePath = Utils.GetInputFilePath(settings);
         var outputFilePath = Utils.GetOutputFilePath(settings, ".bak");
 
-        if (File.Exists(outputFilePath))
+        if (fileSystem.File.Exists(outputFilePath))
         {
             AnsiConsole.MarkupLine($"[red]Backup file already exists at {outputFilePath}[/]");
 
@@ -28,7 +36,7 @@ public class BackupCommand : Command<BackupCommand.Settings>
             }
         }
 
-        File.Copy(inputFilePath, outputFilePath, true);
+        fileSystem.File.Copy(inputFilePath, outputFilePath, true);
 
         AnsiConsole.MarkupLine($"[green]Backup created at {outputFilePath}[/]");
 

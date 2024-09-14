@@ -1,9 +1,14 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
+using System.IO.Abstractions;
 
 public class TemplateRemoveCommand : Command<TemplateRemoveCommand.Settings>
 {
+	private readonly IFileSystem fileSystem;
+	private readonly IHostsFile hostsFile;
+	private readonly IOutputFormatter outputFormatter;
+
 	public class Settings : TemplateSettings
 	{
 		[CommandArgument(0, "<hostname>")]
@@ -19,6 +24,13 @@ public class TemplateRemoveCommand : Command<TemplateRemoveCommand.Settings>
 		public bool Json { get; set; }
 	}
 
+	public TemplateRemoveCommand(IFileSystem fileSystem, IHostsFile hostsFile, IOutputFormatter outputFormatter)
+	{
+		this.fileSystem = fileSystem;
+		this.hostsFile = hostsFile;
+		this.outputFormatter = outputFormatter;
+	}
+
 	public override int Execute(CommandContext context, Settings settings)
 	{
 		var filename = "hosts.ht";
@@ -26,9 +38,9 @@ public class TemplateRemoveCommand : Command<TemplateRemoveCommand.Settings>
 		if (!string.IsNullOrWhiteSpace(settings.TemplatePath))
 			filename = settings.TemplatePath;
 
-		filename = Path.GetFullPath(filename);
+		filename = fileSystem.Path.GetFullPath(filename);
 
-		if (!File.Exists(filename))
+		if (!fileSystem.File.Exists(filename))
 		{
 			AnsiConsole.MarkupLine($"[red]Template file not found at {filename}[/]");
 			return -1;
@@ -36,7 +48,9 @@ public class TemplateRemoveCommand : Command<TemplateRemoveCommand.Settings>
 
 		var list = new List<HostsFileEntry>();
 
-		HostsFile.Process(filename, filename, entry =>
+		var f = fileSystem.FileInfo.New(filename);
+
+		hostsFile.Process(f, f, entry =>
 		{
 			if (entry.Hosts.Equals(settings.HostName, StringComparison.OrdinalIgnoreCase))
 			{
@@ -57,7 +71,7 @@ public class TemplateRemoveCommand : Command<TemplateRemoveCommand.Settings>
 		}
 		else
 		{
-			OutputFormatter.Entries(list, settings.Json);
+			outputFormatter.Entries(list, settings.Json);
 		}
 
 		return 0;

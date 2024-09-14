@@ -1,11 +1,26 @@
-﻿using Spectre.Console.Cli;
+﻿using Spectre.Console;
+using Spectre.Console.Cli;
 using System.ComponentModel;
+using System.IO.Abstractions;
 
 /// <summary>
 /// List the entries in the hosts file.
 /// </summary>
 public class ListCommand : Command<ListCommand.Settings>
 {
+	private readonly IFileSystem fileSystem;
+	private readonly IHostsFile hostsFile;
+	private readonly IOutputFormatter outputFormatter;
+
+	public ListCommand(
+		IFileSystem fileSystem,
+		IHostsFile hostsFile,
+		IOutputFormatter outputFormatter)
+	{
+		this.fileSystem = fileSystem;
+		this.hostsFile = hostsFile;
+		this.outputFormatter = outputFormatter;
+	}
 	public class Settings : CommandSettings, IInputFileSettings
 	{
 		[CommandOption("-i|--input <file>")]
@@ -20,11 +35,22 @@ public class ListCommand : Command<ListCommand.Settings>
 
 	public override int Execute(CommandContext context, Settings settings)
 	{
-        var inputFilePath = Utils.GetInputFilePath(settings);
+		var cd = fileSystem.Directory.GetCurrentDirectory();
+		AnsiConsole.MarkupLine($"[yellow]Current directory:[/] {cd}");
 
-        var entries = HostsFile.Parse(inputFilePath);
+		var inputFilePath = Utils.GetInputFilePath(settings);
 
-		OutputFormatter.Entries(entries, settings.Json);
+		var f = fileSystem.FileInfo.New(inputFilePath);
+
+		if (!f.Exists)
+		{
+			AnsiConsole.MarkupLine($"[red]File not found:[/] {inputFilePath}");
+			return 1;
+		}
+
+		var entries = hostsFile.Parse(f);
+
+		outputFormatter.Entries(entries, settings.Json);
 
 		return 0;
 	}
