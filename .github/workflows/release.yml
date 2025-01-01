@@ -1,0 +1,37 @@
+name: Release Nuget package
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+env:
+  PROJECT_PATH: "src/dotnet.hostsctl/dotnet.hostsctl.csproj"
+  OUTPUT_DIRECTORY: ${{ github.workspace }}/output/
+  NUGET_SOURCE_URL: "https://api.nuget.org/v3/index.json"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.x"
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Build project
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+
+      - name: Create NuGet package
+        run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-restore --no-build --output ${{ env.OUTPUT_DIRECTORY }}
+
+      - name: Publish NuGet package
+        run: dotnet nuget push ${{ env.OUTPUT_DIRECTORY }}/*.nupkg --api-key ${{ secrets.NUGET_AUTH_TOKEN }} --source ${{ env.NUGET_SOURCE_URL }}
